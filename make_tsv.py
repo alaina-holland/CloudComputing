@@ -4,7 +4,7 @@ import base64
 
 # Constants
 PREFIX = 'https://raw.githubusercontent.com/cd-public/books/main/'
-BK_DIR = './books/'
+BK_DIR = './books/' # Adjust "." to specify where the folder "books" is located
 
 def get_file_size(file_path):
     return os.path.getsize(file_path)
