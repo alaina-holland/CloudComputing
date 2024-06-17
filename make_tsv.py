@@ -1,28 +1,38 @@
 import os
 import hashlib
+import base64
 
-PREFIX = 'https://raw.githubusercontent.com/cd-public/books/main/'  # Base URL for the files on GitHub
-BK_DIR = '../books/'  # Local directory containing the files
+# Constants
+PREFIX = 'https://raw.githubusercontent.com/cd-public/books/main/'
+BK_DIR = '../books/'
 
-def calculate_md5(file_path): # source: https://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file
-    """Calculate the MD5 checksum of a file."""
+def get_file_size(filepath):
+    return os.path.getsize(filepath)
+
+# md5 source: https://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file
+def get_md5_checksum(filepath):
     hash_md5 = hashlib.md5()
-    with open(file_path, "rb") as f:
+    with open(filepath, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+    return base64.b64encode(hash_md5.digest()).decode('utf-8')
 
-def create_tsv(bk_dir, prefix):
-    """Create a TSV file with URL, file size, and MD5 checksum for each file in the directory."""
-    with open("books.tsv", "w") as tsv_file:
-        tsv_file.write("url\tsize\tmd5\n")  # Write the header row
-        for root, _, files in os.walk(bk_dir):
-            for file_name in files:
-                file_path = os.path.join(root, file_name)
-                file_size = os.path.getsize(file_path)  # Get file size
-                file_md5 = calculate_md5(file_path)  # Get MD5 checksum
-                url = prefix + file_name  # Construct the URL
-                tsv_file.write(f"{url}\t{file_size}\t{file_md5}\n")  # Write data row
+def generate_tsv(directory, prefix):
+    tsv_lines = ["url\tsize\tmd5"]
+    for filename in os.listdir(directory):
+        filepath = os.path.join(directory, filename)
+        if os.path.isfile(filepath):
+            url = f"{prefix}{filename}"
+            size = get_file_size(filepath)
+            md5 = get_md5_checksum(filepath)
+            tsv_lines.append(f"{url}\t{size}\t{md5}")
+    return tsv_lines
+
+def save_tsv(tsv_lines, output_file):
+    with open(output_file, 'w') as f:
+        for line in tsv_lines:
+            f.write(line + "\n")
 
 if __name__ == "__main__":
-    create_tsv(BK_DIR, PREFIX)
+    tsv_lines = generate_tsv(BK_DIR, PREFIX)
+    save_tsv(tsv_lines, 'books.tsv')
