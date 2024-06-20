@@ -3,15 +3,12 @@ import hashlib
 import base64
 
 # Constants
-PREFIX = 'https://raw.githubusercontent.com/cd-public/books/main/'
-BK_DIR = './books/'  # Updated path
+PREFIX = 'https://raw.githubusercontent.com/alaina-holland/books/main/'  # URL prefix 
+BK_DIR = './books/'  # Local directory containing books
 
 def get_file_size(file_path):
     """Returns the size of the file in bytes."""
     return os.path.getsize(file_path)
-
-# md5 source: https://stackoverflow.com/questions/3431825/generating-an-md5-checksum-of-a-file
-
 
 def get_md5(file_path):
     """Returns the base64-encoded MD5 checksum of the file."""
@@ -34,4 +31,3 @@ def create_tsv():
                 tsv_file.write(f"{file_url}\t{file_size}\t{file_md5}\n")
 
 create_tsv()
-
