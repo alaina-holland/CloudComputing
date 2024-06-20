@@ -22,8 +22,11 @@ def create_tsv():
     """Creates a TSV file with file URLs, sizes, and MD5 checksums."""
     with open('books.tsv', 'w') as tsv_file:
         tsv_file.write('TsvHttpData-1.0\n')
-        for file_name in os.listdir(BK_DIR):
+        for file_name in sorted(os.listdir(BK_DIR)):  # Use sorted to ensure lexicographical order
             file_path = os.path.join(BK_DIR, file_name)
+            # Ignore hidden files and specific files like books.tsv
+            if file_name.startswith('.') or file_name == 'books.tsv':
+                continue
             if os.path.isfile(file_path):
                 file_url = PREFIX + file_name
                 file_size = get_file_size(file_path)
